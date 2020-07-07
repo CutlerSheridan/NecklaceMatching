@@ -102,11 +102,15 @@ same necklace. Find the four words.
             input1 = "aaaaaaaaaa";
             Console.WriteLine($"Input: \"{input1}\"\nRepeats: {Repeats(input1)}\n");
 
+            // this part tests the function that finds the four rotatable words in the word list
+            // commenting it out as it takes forever to run
+            /*
             string[] fourWords = FourMatchingWords();
             foreach (string s in fourWords)
             {
                 Console.WriteLine(s);
             }
+            */
         }
 
         // METHODS
@@ -138,7 +142,12 @@ same necklace. Find the four words.
             necklace = necklace.Remove(0, 1);
             return necklace.Insert(necklace.Length, charToMove.ToString());
         }
-        // this one tells you how many times a string is in a string (a = 1; aaa = 3; abc = 1; abab = 2)
+        // This beautiful solution for the challenge is from someone on reddit:
+        /*
+        public static bool IsSame(string a, string b) => a.Length == b.Length ? (a + a).Contains(b) : false;
+        */
+
+        // BONUS 1 - this one tells you how many times a string is in a string (a = 1; aaa = 3; abc = 1; abab = 2)
         static int Repeats(string n1)
         {
             n1 = n1.ToLower();
@@ -152,7 +161,7 @@ same necklace. Find the four words.
             if (n1 == "") {reps = 1;}
             return reps;
         }
-        // this finds the four IsSame words in the enable1 word list (takes about 10 minutes to run)
+        // BONUS 2 - this finds the four IsSame words in the enable1 word list (takes about 10 minutes to run)
         static string[] FourMatchingWords()
         {
             string url = "https://raw.githubusercontent.com/dolph/dictionary/master/enable1.txt";

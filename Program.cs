@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.IO;
+using System.Collections.Generic;
 
 namespace NecklaceMatching
 {
@@ -54,6 +55,79 @@ Optional Bonus 2
 There is exactly one set of four words in the enable1 word list that all describe the 
 same necklace. Find the four words.
     */
+
+// *****************************************************************************
+// *****************************************************************************
+// *****************************************************************************
+
+// INTERMEDIATE CHALLENGE INSTRUCTIONS:
+/*
+For the purpose of this challenge, a k-ary necklace of length n is a sequence of n letters 
+chosen from k options, e.g. ABBEACEEA is a 5-ary necklace of length 9. 
+Note that not every letter needs to appear in the necklace. 
+Two necklaces are equal if you can move some letters from the beginning to the 
+end to make the other one, otherwise maintaining the order. For instance, ABCDE is equal to DEABC. 
+For more detail, see challenge #383 Easy: Necklace matching.
+
+Today's challenge is, given k and n, find the number of distinct k-ary necklaces of length n. 
+That is, the size of the largest set of k-ary necklaces of length n such that no two of them are 
+equal to each other. You do not need to actually generate the necklaces, just count them.
+
+For example, there are 24 distinct 3-ary necklaces of length 4, so 
+necklaces(3, 4) is 24. Here they are:
+
+AAAA  BBBB  CCCC
+AAAB  BBBC  CCCA
+AAAC  BBBA  CCCB
+AABB  BBCC  CCAA
+ABAB  BCBC  CACA
+AABC  BBCA  CCAB
+AACB  BBAC  CCBA
+ABAC  BCBA  CACB
+You only need to handle inputs such that kn < 10,000.
+
+necklaces(2, 12) => 352
+necklaces(3, 7) => 315
+necklaces(9, 4) => 1665
+necklaces(21, 3) => 3101
+necklaces(99, 2) => 4950
+The most straightforward way to count necklaces is to generate all kn patterns, 
+and deduplicate them (potentially using your code from Easy #383). 
+This is an acceptable approach for this challenge, as long as you can actually run your 
+program through to completion for the above examples.
+
+Optional optimization
+A more efficient way is with the formula:
+
+necklaces(k, n) = 1/n * Sum of (phi(a) k^b)
+    for all positive integers a,b such that a*b = n.
+For example, the ways to factor 10 into two positive integers are 1x10, 2x5, 5x2, and 10x1, so:
+
+necklaces(3, 10)
+    = 1/10 (phi(1) 3^10 + phi(2) 3^5 + phi(5) 3^2 + phi(10) 3^1)
+    = 1/10 (1 * 59049 + 1 * 243 + 4 * 9 + 4 * 3)
+    = 5934
+phi(a) is Euler's totient function, which is the number of positive integers x less than or 
+equal to a such that the greatest common divisor of x and a is 1. 
+For instance, phi(12) = 4, because 1, 5, 7, and 11 are coprime with 12.
+
+An efficient way to compute phi is with the formula:
+
+phi(a) = a * Product of (p-1) / Product of (p)
+    for all distinct prime p that divide evenly into a.
+For example, for a = 12, the primes that divide a are 2 and 3. So:
+
+phi(12) = 12 * ((2-1)*(3-1)) / (2*3) = 12 * 2 / 6 = 4
+If you decide to go this route, you can test much bigger examples.
+
+necklaces(3, 90) => 96977372978752360287715019917722911297222
+necklaces(123, 18) => 2306850769218800390268044415272597042
+necklaces(1234567, 6) => 590115108867910855092196771880677924
+necklaces(12345678910, 3) => 627225458787209496560873442940
+If your language doesn't easily let you handle such big numbers, that's okay. 
+But your program should run much faster than O(kn).
+*/
+
     class Program
     {
         static void Main(string[] args)
@@ -111,6 +185,26 @@ same necklace. Find the four words.
                 Console.WriteLine(s);
             }
             */
+
+            Console.WriteLine("INTERMEDIATE CHALLENGE RESULTS\n");
+            //INTERMEDIATE CHALLENGE HERE:
+            Console.WriteLine($"phi(1) = {Phi(1)} (should be 1)");
+            Console.WriteLine($"phi(2) = {Phi(2)} (should be 1)");
+            Console.WriteLine($"phi(9) = {Phi(9)} (should be 6)");
+            Console.WriteLine($"phi(12) = {Phi(12)} (should be 4)");
+            Console.WriteLine($"phi(10) = {Phi(10)} (should be 4)");
+            Console.WriteLine($"phi(5) = {Phi(5)} (should be 4)");
+            Console.WriteLine($"phi(3) = {Phi(3)} (should be 2)");
+            Console.WriteLine();
+            Console.WriteLine($"necklaces(3, 4) = {Necklaces(3, 4)} - (should be 24)");
+            Console.WriteLine($"necklaces(2, 12) = {Necklaces(2, 12)} - (should be 352)");
+            Console.WriteLine($"necklaces(3, 7) = {Necklaces(3, 7)} - (should be 315)");
+            Console.WriteLine($"necklaces(9, 4) = {Necklaces(9, 4)} - (should be 1665)");
+            Console.WriteLine($"necklaces(21, 3) = {Necklaces(21, 3)} - (should be 3101)");
+            Console.WriteLine($"necklaces(99, 2) = {Necklaces(99, 2)} - (should be 4950)");
+            Console.WriteLine($"necklaces(3, 10) = {Necklaces(3, 10)} - (should be 5934)");
+            Console.WriteLine($"necklaces(12345678910, 3) = {Necklaces(12345678910, 3)} - (should be 627225458787209496560873442940)");
+            Console.WriteLine();
         }
 
         // METHODS
@@ -192,5 +286,69 @@ same necklace. Find the four words.
             }
             return fourWords;
         }
+        // *************************************************************************************
+        // INTERMEDIATE CHALLENGE FUNCTIONS
+        // main function for possible combos of k-ary necklaces of length n
+        // necklaces(k, n) = 1/n * Sum of (phi(a) k^b) -- for all positive integers a,b such that a*b = n
+        static double Necklaces(double k, double n)
+        {
+            List<double> divisibles = new List<double>();
+            for (double d = 1; d <= n; d++)
+            {
+                if (n % d == 0)
+                {
+                    divisibles.Add(d);
+                    divisibles.Add(n / d);
+                }
+            }
+
+            double backSum = 0;
+            // this starts at 0 index and calculates the back half of the equation
+            for (int d = 0; d < divisibles.Count - 1; d += 2)
+            {
+                backSum += Phi(divisibles[d]) * Math.Pow(k, divisibles[d+1]);
+            }
+            return 1 / n * backSum;
+
+        }
+        // calculate phi
+        // phi(a) = a * Product of (p-1) / Product of (p) -- for all distinct prime p that divide evenly into a.
+        static double Phi(double input)
+        {
+            // first we need a list of all the primes AND can multiply into "input"
+            List<double> primes = new List<double>();
+            for (double d = 2; d <= input; d++)
+            {
+                if (IsPrime(d) && input % d == 0)
+                {
+                    primes.Add(d);
+                }
+            }
+            // figure out numerator and denominator
+            double numerator = input;
+            double denominator = 1;
+            foreach (double d in primes)
+            {
+                numerator *= d - 1;
+                denominator *= d;
+            }
+            // calculate the result
+            return numerator / denominator;
+            
+        }
+        // calculate if a number is prime
+        static bool IsPrime(double num)
+        {
+            if (num < 2) {return false;}
+            for (double d = 2; d < num; d++)
+            {
+                if (num % d == 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
 }
